@@ -1,11 +1,17 @@
 package main
 
 import (
-	"database/sql"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
+
+type Track struct {
+	Data string `json:"data"`
+}
 
 func tracksHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/tracks" {
@@ -13,36 +19,49 @@ func tracksHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method == "POST" {
+	if r.Method != "PUT" {
 		http.Error(w, "Method is not supported.", http.StatusNotFound)
 		return
 	}
 
-	fmt.Fprintf(w, "Tracks will be listed here.")
+	// Read the request body
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Error reading request body.", http.StatusBadRequest)
+		return
+	}
+
+	// Base64 decode the data
+	decodedData, err := base64.StdEncoding.DecodeString(string(body))
+	if err != nil {
+		http.Error(w, "Error decoding Base64 data.", http.StatusBadRequest)
+		return
+	}
+
+	// Save the decoded data to a JSON file
+	track := Track{
+		Data: string(decodedData),
+	}
+	trackData, err := json.Marshal(track)
+	if err != nil {
+		http.Error(w, "Error encoding JSON data.", http.StatusInternalServerError)
+		return
+	}
+	err = ioutil.WriteFile("track.json", trackData, 0644)
+	if err != nil {
+		http.Error(w, "Error writing to file.", http.StatusInternalServerError)
+		return
+	}
+
+	// Return a success message
+	fmt.Fprintf(w, "Track data saved to track.json.")
 }
 
 func main() {
-
-	http.HandleFunc("/tracks", tracksHandler) // Update this line of code
+	http.HandleFunc("/tracks", tracksHandler)
 
 	fmt.Printf("Starting server at port 3000\n")
 	if err := http.ListenAndServe(":3000", nil); err != nil {
 		log.Fatal(err)
-
 	}
-	fmt.Println("Go MySQL Tutorial")
-
-	// Open up our database connection.
-	// I've set up a database on my local machine using phpmyadmin.
-	// The database is called testDb
-	db, err := sql.Open("mysql", "username:password@tcp(127.0.0.1:3306)/test")
-
-	// if there is an error opening the connection, handle it
-	if err != nil {
-		panic(err.Error())
-	}
-
-	// defer the close till after the main function has finished
-	// executing
-	defer db.Close()
 }

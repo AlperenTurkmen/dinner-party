@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/addison.iml" filepath="$PROJECT_DIR$/.idea/addison.iml" />
+      <module fileurl="file://$USER_HOME$/Downloads/demonstration/.idea/demonstration.iml" filepath="$USER_HOME$/Downloads/demonstration/.idea/demonstration.iml" />
+      <module fileurl="file://$USER_HOME$/Downloads/spreadsheet/.idea/spreadsheet.iml" filepath="$USER_HOME$/Downloads/spreadsheet/.idea/spreadsheet.iml" />
+    </modules>
+  </component>
+</project>
